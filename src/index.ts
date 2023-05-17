@@ -247,4 +247,58 @@ export class LordOfTheRingsSDK {
 
     return await response.json();
   }
+
+  /**
+   * This method retrieves a specific quote from the Lord of the Rings API.
+   * @param quoteId the ID of the quote to retrieve
+   * @returns a `Promise` resolving to the quote data
+   * @throws an `Error` if the API key is missing, or if a quote with id `quoteId` does not exist
+   * @example
+   * ```typescript
+   * try {
+   *   const quote = await lotrSDK.getQuote('5cd96e05de30eff6ebcced6b');
+   *   console.log(quote);
+   * } catch (error) {
+   *   // This block shouldn't execute.
+   *   console.error(error);
+   * }
+   *
+   * try {
+   *   const quote = await lotrSDK.getQuote('INVALID_QUOTE_ID');
+   *   console.log(quote);
+   * } catch (error) {
+   *   // This block should execute.
+   *   console.error(error);
+   * }
+   * ```
+   */
+  public async getQuote(quoteId: string): Promise<QuoteData> {
+    if (!this.apiKey) {
+      throw new Error(
+        `API key is missing in ${this.getQuote.name}('${quoteId}') call.`
+      );
+    }
+
+    const headers = {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+
+    const response = await fetch(
+      `https://the-one-api.dev/v2/quote/${quoteId}`,
+      {
+        headers
+      }
+    );
+
+    const json = await response.json();
+
+    if (json.message === 'Something went wrong.' && json.success === false) {
+      throw new Error(
+        this.getQuote.name + ' did not find a quote with id "' + quoteId + '".'
+      );
+    }
+
+    return json;
+  }
 }

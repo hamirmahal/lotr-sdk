@@ -38,6 +38,12 @@ describe(LordOfTheRingsSDK.name, () => {
       'API key is missing in ' + lotrSDK.getAllQuotes.name + ' call.'
     );
   });
+  it('should throw an error with a useful message if requesting a quote without successful authentication', async () => {
+    const validQuoteId = '5cd96e05de30eff6ebcced6b';
+    expect(lotrSDK.getQuote(validQuoteId)).rejects.toThrowError(
+      `API key is missing in ${lotrSDK.getQuote.name}('${validQuoteId}') call.`
+    );
+  });
 
   // All tests beyond this point should have a valid API key.
   it('should authenticate without error with a correct API key', async () => {
@@ -63,6 +69,14 @@ describe(LordOfTheRingsSDK.name, () => {
     ).rejects.toThrowError(
       lotrSDK.getQuotesForMovie.name +
         ' did not find a movie with id "THIS_IS_AN_INVALID_MOVIE_ID".'
+    );
+  });
+  it('should throw an error with a useful message if requesting an invalid quote ID', async () => {
+    expect(
+      lotrSDK.getQuote('THIS_IS_AN_INVALID_QUOTE_ID')
+    ).rejects.toThrowError(
+      lotrSDK.getQuote.name +
+        ' did not find a quote with id "THIS_IS_AN_INVALID_QUOTE_ID".'
     );
   });
   it('should fetch a valid movie ID without error', async () => {
@@ -95,5 +109,25 @@ describe(LordOfTheRingsSDK.name, () => {
   it('should fetch quotes once authenticated', async () => {
     const actualQuotes = await lotrSDK.getAllQuotes();
     expect(actualQuotes).toEqual(allQuotes);
+  });
+  it('should fetch a quote with a valid ID without error', async () => {
+    const actualQuote = await lotrSDK.getQuote('5cd96e05de30eff6ebcced6b');
+    const expectedQuote = {
+      docs: [
+        {
+          _id: '5cd96e05de30eff6ebcced6b',
+          dialog: 'Frodo! Frodo!',
+          movie: '5cd95395de30eff6ebccde5c',
+          character: '5cd99d4bde30eff6ebccfd06',
+          id: '5cd96e05de30eff6ebcced6b'
+        }
+      ],
+      total: 1,
+      limit: 1000,
+      offset: 0,
+      page: 1,
+      pages: 1
+    };
+    expect(actualQuote).toEqual(expectedQuote);
   });
 });
