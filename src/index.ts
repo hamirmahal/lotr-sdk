@@ -19,6 +19,23 @@ interface Movie {
   rottenTomatoesScore: number;
 }
 
+interface QuoteData {
+  docs: Quote[];
+  total: number;
+  limit: number;
+  offset: number;
+  page: number;
+  pages: number;
+}
+
+interface Quote {
+  _id: string;
+  dialog: string;
+  movie: string;
+  character: string;
+  id: string;
+}
+
 /**
  * This is the main class for interacting with the Lord of the Rings API.
  * @example
@@ -141,6 +158,63 @@ export class LordOfTheRingsSDK {
     if (json.message === 'Something went wrong.' && json.success === false) {
       throw new Error(
         this.getMovie.name + ' did not find a movie with id "' + movieId + '".'
+      );
+    }
+
+    return json;
+  }
+
+  /**
+   * This method retrieves quotes for a specific movie in the Lord of the Rings API.
+   * @param apiKey the API key for authentication
+   * @param movieId the ID of the movie for which to retrieve quotes
+   * @returns a Promise resolving to the quotes data
+   * @throws an `Error` if the API key is missing, or if a movie with id `movieId` does not exist
+   * @example
+   * ```typescript
+   * try {
+   *   const quotes = await lotrSDK.getQuotesForMovie('5cd95395de30eff6ebccde5c');
+   *   console.log(quotes);
+   * } catch (error) {
+   *   // This block shouldn't execute.
+   *   console.error(error);
+   * }
+   *
+   * try {
+   *   const quotes = await lotrSDK.getQuotesForMovie('INVALID_MOVIE_ID');
+   * } catch (error) {
+   *   // This block should execute.
+   *   console.error(error);
+   * }
+   * ```
+   */
+  public async getQuotesForMovie(movieId: string): Promise<QuoteData> {
+    if (!this.apiKey) {
+      throw new Error(
+        `API key is missing in ${this.getQuotesForMovie.name}('${movieId}') call.`
+      );
+    }
+
+    const headers = {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+
+    const response = await fetch(
+      `https://the-one-api.dev/v2/movie/${movieId}/quote`,
+      {
+        headers
+      }
+    );
+
+    const json = await response.json();
+
+    if (json.message === 'Something went wrong.' && json.success === false) {
+      throw new Error(
+        this.getQuotesForMovie.name +
+          ' did not find a movie with id "' +
+          movieId +
+          '".'
       );
     }
 

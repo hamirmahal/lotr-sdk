@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { LordOfTheRingsSDK } from '../src/index';
 import allMovies from './fixtures/allMovies';
+import expectedQuotes from './fixtures/quotes';
 
 // Load environment variables, like the API key.
 dotenv.config();
@@ -25,6 +26,12 @@ describe(LordOfTheRingsSDK.name, () => {
       'API key is missing in ' + lotrSDK.getMovie.name + ' call.'
     );
   });
+  it('should throw an error with a useful message if requesting quotes without successful authentication', async () => {
+    const validMovieId = '5cd95395de30eff6ebccde5c';
+    expect(lotrSDK.getQuotesForMovie(validMovieId)).rejects.toThrowError(
+      `API key is missing in ${lotrSDK.getQuotesForMovie.name}('${validMovieId}') call.`
+    );
+  });
 
   // All tests beyond this point should have a valid API key.
   it('should authenticate without error with a correct API key', async () => {
@@ -41,6 +48,14 @@ describe(LordOfTheRingsSDK.name, () => {
       lotrSDK.getMovie('THIS_IS_AN_INVALID_MOVIE_ID')
     ).rejects.toThrowError(
       lotrSDK.getMovie.name +
+        ' did not find a movie with id "THIS_IS_AN_INVALID_MOVIE_ID".'
+    );
+  });
+  it('should throw an error with a useful message if requesting quotes for a movie ID that does not exist', async () => {
+    expect(
+      lotrSDK.getQuotesForMovie('THIS_IS_AN_INVALID_MOVIE_ID')
+    ).rejects.toThrowError(
+      lotrSDK.getQuotesForMovie.name +
         ' did not find a movie with id "THIS_IS_AN_INVALID_MOVIE_ID".'
     );
   });
@@ -66,5 +81,9 @@ describe(LordOfTheRingsSDK.name, () => {
       pages: 1
     };
     expect(actualMovie).toEqual(expectedMovie);
+  });
+  it('should fetch quotes from a valid movie ID without error', async () => {
+    const quotes = await lotrSDK.getQuotesForMovie('5cd95395de30eff6ebccde5c');
+    expect(quotes).toEqual(expectedQuotes);
   });
 });
