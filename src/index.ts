@@ -220,4 +220,32 @@ export class LordOfTheRingsSDK {
 
     return json;
   }
+
+  /**
+   * This method retrieves all quotes from the Lord of the Rings API.
+   * @returns a `Promise` resolving to the quotes data
+   * @throws an `Error` if the API key is missing
+   * @example
+   * ```typescript
+   * const quotes = await lotrSDK.getAllQuotes();
+   * ```
+   */
+  public async getAllQuotes(): Promise<QuoteData> {
+    if (!this.apiKey) {
+      throw new Error(
+        'API key is missing in ' + this.getAllQuotes.name + ' call.'
+      );
+    }
+
+    const headers = {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+
+    const response = await fetch('https://the-one-api.dev/v2/quote', {
+      headers
+    });
+
+    return await response.json();
+  }
 }

@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { LordOfTheRingsSDK } from '../src/index';
 import allMovies from './fixtures/allMovies';
+import allQuotes from './fixtures/allQuotes';
 import expectedQuotes from './fixtures/quotes';
 
 // Load environment variables, like the API key.
@@ -30,6 +31,11 @@ describe(LordOfTheRingsSDK.name, () => {
     const validMovieId = '5cd95395de30eff6ebccde5c';
     expect(lotrSDK.getQuotesForMovie(validMovieId)).rejects.toThrowError(
       `API key is missing in ${lotrSDK.getQuotesForMovie.name}('${validMovieId}') call.`
+    );
+  });
+  it('should throw an error with a useful message if requesting all quotes without successful authentication', async () => {
+    expect(lotrSDK.getAllQuotes()).rejects.toThrowError(
+      'API key is missing in ' + lotrSDK.getAllQuotes.name + ' call.'
     );
   });
 
@@ -85,5 +91,9 @@ describe(LordOfTheRingsSDK.name, () => {
   it('should fetch quotes from a valid movie ID without error', async () => {
     const quotes = await lotrSDK.getQuotesForMovie('5cd95395de30eff6ebccde5c');
     expect(quotes).toEqual(expectedQuotes);
+  });
+  it('should fetch quotes once authenticated', async () => {
+    const actualQuotes = await lotrSDK.getAllQuotes();
+    expect(actualQuotes).toEqual(allQuotes);
   });
 });
