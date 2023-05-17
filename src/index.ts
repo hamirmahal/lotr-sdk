@@ -50,6 +50,16 @@ interface RequestOptions {
    * Pages appear to have a default size of `1000`.
    */
   page?: number;
+  /**
+   * If this is `true`, the results will be sorted in descending order.
+   * This property does nothing if `sortProperty` is not specified.
+   */
+  sortDescending?: boolean;
+  /**
+   * This is the property to sort on. If this isn't actually a valid property,
+   * results will arrive in their default order.
+   */
+  sortProperty?: string;
 }
 
 /**
@@ -268,6 +278,11 @@ export class LordOfTheRingsSDK {
    * const quote = await lotrSDK.getAllQuotes({ limit: 1 });
    * const quotesPage3 = await lotrSDK.getAllQuotes({ page: 3 });
    * const offsetQuotes = await lotrSDK.getAllQuotes({ offset: 2380 });
+   * const second6SortedQuotes = await lotrSDK.getAllQuotes({
+   *   limit: 6,
+   *   page: 2,
+   *   sortProperty: 'dialog'
+   *});
    * ```
    */
   public async getAllQuotes(options?: RequestOptions): Promise<QuoteData> {
@@ -353,6 +368,24 @@ export class LordOfTheRingsSDK {
    *   headers
    * );
    * console.log(json);
+   *
+   * const sortedMovies = await lotrSDK.getMovies({
+   *   sortProperty: 'name'
+   * });
+   * const reverseSortedMovies = await lotrSDK.getMovies({
+   *   sortDescending: true,
+   *   sortProperty: 'name'
+   * });
+   * const middleMovies = await lotrSDK.getMovies({
+   *   limit: 3,
+   *   page: 2,
+   *   sortProperty: 'name'
+   * });
+   * const lastReverseSortedMovies = await lotrSDK.getMovies({
+   *   offset: 5,
+   *   sortDescending: true,
+   *   sortProperty: 'name'
+   * });
    * ```
    */
   private async fetchJson(
@@ -363,10 +396,17 @@ export class LordOfTheRingsSDK {
     },
     options?: RequestOptions
   ): Promise<any> {
-    const queryParams = new URLSearchParams(
-      (options as Record<string, string>) || {}
-    ).toString();
-    const fetchUrl = queryParams ? `${url}?${queryParams}` : url;
+    const params = new URLSearchParams();
+    const { limit, offset, page, sortDescending, sortProperty } = options || {};
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
+    if (page) params.append('page', page.toString());
+    if (sortProperty) {
+      const sortDirection = sortDescending ? 'desc' : 'asc';
+      params.append('sort', `${sortProperty}:${sortDirection}`);
+    }
+
+    const fetchUrl = url + (params.toString() ? `?${params.toString()}` : '');
     const response = await fetch(fetchUrl, { headers });
     return await response.json();
   }

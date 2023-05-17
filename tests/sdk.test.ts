@@ -5,9 +5,14 @@ import quotes100 from './fixtures/100Quotes';
 import allMovies from './fixtures/allMovies';
 import allQuotes from './fixtures/allQuotes';
 import fellowshipQuotesPage2 from './fixtures/fellowshipQuotesPage2';
+import lastReverseSortedMovies from './fixtures/lastReverseSortedMovies';
+import middleSortedMovies from './fixtures/middleSortedMovies';
 import moviesPage3Limit3 from './fixtures/moviesPage3Limit3';
 import offsetQuotes from './fixtures/offsetQuotes';
 import expectedQuotes from './fixtures/quotes';
+import reverseSortedMovies from './fixtures/reverseSortedMovies';
+import second6QuotesSortedByDialog from './fixtures/second6SortedQuotes';
+import sortedMovies from './fixtures/sortedMovies';
 
 // Load environment variables, like the API key.
 dotenv.config();
@@ -177,5 +182,38 @@ describe(LordOfTheRingsSDK.name, () => {
     expect(actualQuotes.docs.length).toBe(
       actualQuotes.total - actualQuotes.offset
     );
+  });
+  it('should correctly handle sorting', async () => {
+    const sortingOnInvalidProperty = await lotrSDK.getMovies({
+      sortProperty: 'INVALID_PROPERTY'
+    });
+    const actualSortedMovies = await lotrSDK.getMovies({
+      sortProperty: 'name'
+    });
+    const actualReverseSortedMovies = await lotrSDK.getMovies({
+      sortDescending: true,
+      sortProperty: 'name'
+    });
+    const actualMiddleSortedMovies = await lotrSDK.getMovies({
+      limit: 3,
+      page: 2,
+      sortProperty: 'name'
+    });
+    const actualLastReverseSortedMovies = await lotrSDK.getMovies({
+      offset: 5,
+      sortDescending: true,
+      sortProperty: 'name'
+    });
+    const actualSecond6SortedQuotes = await lotrSDK.getAllQuotes({
+      limit: 6,
+      page: 2,
+      sortProperty: 'dialog'
+    });
+    expect(actualSecond6SortedQuotes).toEqual(second6QuotesSortedByDialog);
+    expect(actualLastReverseSortedMovies).toEqual(lastReverseSortedMovies);
+    expect(actualReverseSortedMovies).toEqual(reverseSortedMovies);
+    expect(actualMiddleSortedMovies).toEqual(middleSortedMovies);
+    expect(sortingOnInvalidProperty).toEqual(allMovies);
+    expect(actualSortedMovies).toEqual(sortedMovies);
   });
 });
