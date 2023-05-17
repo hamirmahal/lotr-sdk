@@ -1,2 +1,5 @@
+# Avoid committing API secrets to source control.
+.env
+
 # Ignore installed dependencies.
 node_modules/
