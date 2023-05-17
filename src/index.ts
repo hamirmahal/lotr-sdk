@@ -36,6 +36,22 @@ interface Quote {
   id: string;
 }
 
+interface RequestOptions {
+  /**
+   * This is the amount of results per page.
+   */
+  limit?: number;
+  /**
+   * This is the number of results to skip.
+   */
+  offset?: number;
+  /**
+   * This is the page number to retrieve.
+   * Pages appear to have a default size of `1000`.
+   */
+  page?: number;
+}
+
 /**
  * This is the main class for interacting with the Lord of the Rings API.
  * @example
@@ -87,18 +103,31 @@ export class LordOfTheRingsSDK {
 
   /**
    * This method retrieves information about all movies in the Lord of the Rings API.
+   * @param requestOptions optional options to use for the request
+   *
+   * Set a `limit` if you want to limit the number of results returned.
+   *
+   * Set an `offset` if you want to skip a number of results.
+   *
+   * Set a `page` if you want to see a certain page of results.
+   * If `limit` is not specified, the assumed page size is 1000.
    * @returns a `Promise` resolving to the movie data
    * @throws an `Error` if the API key is missing
    * @example
    * ```typescript
    * const actualMovies = await lotrSDK.getMovies();
+   * const actualMoviesPage3Limit3 = await lotrSDK.getMovies({
+   *   limit: 3,
+   *   page: 3
+   * });
    * ```
    */
-  public async getMovies(): Promise<MovieData> {
+  public async getMovies(options?: RequestOptions): Promise<MovieData> {
     const headers = this.getHeaders(`${this.getMovies.name}()`);
     const json = await this.fetchJson(
       'https://the-one-api.dev/v2/movie',
-      headers
+      headers,
+      options
     );
     return json;
   }
@@ -106,6 +135,14 @@ export class LordOfTheRingsSDK {
   /**
    * This method retrieves information about a specific movie in the Lord of the Rings API.
    * @param movieId the ID of the movie to retrieve
+   * @param requestOptions optional options to use for the request
+   *
+   * Set a `limit` if you want to limit the number of results returned.
+   *
+   * Set an `offset` if you want to skip a number of results.
+   *
+   * Set a `page` if you want to see a certain page of results.
+   * If `limit` is not specified, the assumed page size is 1000.
    * @returns a `Promise` resolving to the movie data
    * @throws an `Error` if the API key is missing, or if the movie ID does not exist
    * @example
@@ -126,11 +163,15 @@ export class LordOfTheRingsSDK {
    * }
    * ```
    */
-  public async getMovie(movieId: string): Promise<MovieData> {
+  public async getMovie(
+    movieId: string,
+    options?: RequestOptions
+  ): Promise<MovieData> {
     const headers = this.getHeaders(`${this.getMovie.name}('${movieId}')`);
     const json = await this.fetchJson(
       `https://the-one-api.dev/v2/movie/${movieId}`,
-      headers
+      headers,
+      options
     );
 
     if (json.message === 'Something went wrong.' && json.success === false) {
@@ -145,12 +186,22 @@ export class LordOfTheRingsSDK {
   /**
    * This method retrieves quotes for a specific movie in the Lord of the Rings API.
    * @param movieId the ID of the movie for which to retrieve quotes
+   * @param requestOptions optional options to use for the request
+   *
+   * Set a `limit` if you want to limit the number of results returned.
+   *
+   * Set an `offset` if you want to skip a number of results.
+   *
+   * Set a `page` if you want to see a certain page of results.
+   * If `limit` is not specified, the assumed page size is 1000.
    * @returns a `Promise` resolving to the quotes data
    * @throws an `Error` if the API key is missing, or if a movie with id `movieId` does not exist
    * @example
    * ```typescript
    * try {
-   *   const quotes = await lotrSDK.getQuotesForMovie('5cd95395de30eff6ebccde5c');
+   *   const quotes = await lotrSDK.getQuotesForMovie(
+   *     '5cd95395de30eff6ebccde5c'
+   *   );
    *   console.log(quotes);
    * } catch (error) {
    *   // This block shouldn't execute.
@@ -163,16 +214,28 @@ export class LordOfTheRingsSDK {
    *   // This block should execute.
    *   console.error(error);
    * }
+   *
+   * const fellowshipQuotes = await lotrSDK.getQuotesForMovie(
+   *   '5cd95395de30eff6ebccde5c',
+   *   {
+   *     limit: 500,
+   *     page: 2
+   *   }
+   * );
    * ```
    */
-  public async getQuotesForMovie(movieId: string): Promise<QuoteData> {
+  public async getQuotesForMovie(
+    movieId: string,
+    options?: RequestOptions
+  ): Promise<QuoteData> {
     const headers = this.getHeaders(
       `${this.getQuotesForMovie.name}('${movieId}')`
     );
 
     const json = await this.fetchJson(
       `https://the-one-api.dev/v2/movie/${movieId}/quote`,
-      headers
+      headers,
+      options
     );
 
     if (json.message === 'Something went wrong.' && json.success === false) {
@@ -189,18 +252,30 @@ export class LordOfTheRingsSDK {
 
   /**
    * This method retrieves all quotes from the Lord of the Rings API.
+   * @param requestOptions optional options to use for the request
+   *
+   * Set a `limit` if you want to limit the number of results returned.
+   *
+   * Set an `offset` if you want to skip a number of results.
+   *
+   * Set a `page` if you want to see a certain page of results.
+   * If `limit` is not specified, the assumed page size is 1000.
    * @returns a `Promise` resolving to the quotes data
    * @throws an `Error` if the API key is missing
    * @example
    * ```typescript
-   * const quotes = await lotrSDK.getAllQuotes();
+   * const allQuotes = await lotrSDK.getAllQuotes();
+   * const quote = await lotrSDK.getAllQuotes({ limit: 1 });
+   * const quotesPage3 = await lotrSDK.getAllQuotes({ page: 3 });
+   * const offsetQuotes = await lotrSDK.getAllQuotes({ offset: 2380 });
    * ```
    */
-  public async getAllQuotes(): Promise<QuoteData> {
+  public async getAllQuotes(options?: RequestOptions): Promise<QuoteData> {
     const headers = this.getHeaders(`${this.getAllQuotes.name}()`);
     const json = await this.fetchJson(
       'https://the-one-api.dev/v2/quote',
-      headers
+      headers,
+      options
     );
     return json;
   }
@@ -208,6 +283,14 @@ export class LordOfTheRingsSDK {
   /**
    * This method retrieves a specific quote from the Lord of the Rings API.
    * @param quoteId the ID of the quote to retrieve
+   * @param requestOptions optional options to use for the request
+   *
+   * Set a `limit` if you want to limit the number of results returned.
+   *
+   * Set an `offset` if you want to skip a number of results.
+   *
+   * Set a `page` if you want to see a certain page of results.
+   * If `limit` is not specified, the assumed page size is 1000.
    * @returns a `Promise` resolving to the quote data
    * @throws an `Error` if the API key is missing, or if a quote with id `quoteId` does not exist
    * @example
@@ -229,11 +312,15 @@ export class LordOfTheRingsSDK {
    * }
    * ```
    */
-  public async getQuote(quoteId: string): Promise<QuoteData> {
+  public async getQuote(
+    quoteId: string,
+    options?: RequestOptions
+  ): Promise<QuoteData> {
     const headers = this.getHeaders(`${this.getQuote.name}('${quoteId}')`);
     const json = await this.fetchJson(
       `https://the-one-api.dev/v2/quote/${quoteId}`,
-      headers
+      headers,
+      options
     );
 
     if (json.message === 'Something went wrong.' && json.success === false) {
@@ -249,6 +336,14 @@ export class LordOfTheRingsSDK {
    * This helper method fetches a `JSON` response from `url` with the given headers.
    * @param url the URL to fetch
    * @param headers the headers to include in the request
+   * @param requestOptions optional options to use for the request
+   *
+   * Set a `limit` if you want to limit the number of results returned.
+   *
+   * Set an `offset` if you want to skip a number of results.
+   *
+   * Set a `page` if you want to see a certain page of results.
+   * If `limit` is not specified, the assumed page size is 1000.
    * @returns the parsed `JSON` response
    * @example
    * ```typescript
@@ -265,9 +360,14 @@ export class LordOfTheRingsSDK {
     headers: {
       Authorization: string;
       'Content-Type': 'application/json';
-    }
+    },
+    options?: RequestOptions
   ): Promise<any> {
-    const response = await fetch(url, { headers });
+    const queryParams = new URLSearchParams(
+      (options as Record<string, string>) || {}
+    ).toString();
+    const fetchUrl = queryParams ? `${url}?${queryParams}` : url;
+    const response = await fetch(fetchUrl, { headers });
     return await response.json();
   }
 

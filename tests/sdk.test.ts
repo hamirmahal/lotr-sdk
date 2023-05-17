@@ -1,7 +1,12 @@
 import * as dotenv from 'dotenv';
 import { LordOfTheRingsSDK } from '../src/index';
+import expected1000QuotesPage3 from './fixtures/1000QuotesPage3';
+import quotes100 from './fixtures/100Quotes';
 import allMovies from './fixtures/allMovies';
 import allQuotes from './fixtures/allQuotes';
+import fellowshipQuotesPage2 from './fixtures/fellowshipQuotesPage2';
+import moviesPage3Limit3 from './fixtures/moviesPage3Limit3';
+import offsetQuotes from './fixtures/offsetQuotes';
 import expectedQuotes from './fixtures/quotes';
 
 // Load environment variables, like the API key.
@@ -129,5 +134,48 @@ describe(LordOfTheRingsSDK.name, () => {
       pages: 1
     };
     expect(actualQuote).toEqual(expectedQuote);
+  });
+  it('should correctly handle pages and limits', async () => {
+    const oneQuote = await lotrSDK.getAllQuotes({ limit: 1 });
+    const actualQuotesPage3 = await lotrSDK.getAllQuotes({ page: 3 });
+    const actual100Quotes = await lotrSDK.getAllQuotes({ limit: 100 });
+    const actualMoviesPage3Limit3 = await lotrSDK.getMovies({
+      limit: 3,
+      page: 3
+    });
+    const actualFellowshipQuotes = await lotrSDK.getQuotesForMovie(
+      '5cd95395de30eff6ebccde5c',
+      {
+        limit: 500,
+        page: 2
+      }
+    );
+    expect(actualFellowshipQuotes).toEqual(fellowshipQuotesPage2);
+    expect(actualMoviesPage3Limit3).toEqual(moviesPage3Limit3);
+    expect(actualQuotesPage3).toEqual(expected1000QuotesPage3);
+    expect(actual100Quotes).toEqual(quotes100);
+    expect(oneQuote).toEqual({
+      docs: [
+        {
+          _id: '5cd96e05de30eff6ebcce7e9',
+          dialog: 'Deagol!',
+          movie: '5cd95395de30eff6ebccde5d',
+          character: '5cd99d4bde30eff6ebccfe9e',
+          id: '5cd96e05de30eff6ebcce7e9'
+        }
+      ],
+      total: 2384,
+      limit: 1,
+      offset: 0,
+      page: 1,
+      pages: 2384
+    });
+  });
+  it('should correctly handle offsets', async () => {
+    const actualQuotes = await lotrSDK.getAllQuotes({ offset: 2380 });
+    expect(actualQuotes).toEqual(offsetQuotes);
+    expect(actualQuotes.docs.length).toBe(
+      actualQuotes.total - actualQuotes.offset
+    );
   });
 });
