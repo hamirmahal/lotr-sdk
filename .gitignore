@@ -1,5 +1,8 @@
 # Avoid committing API secrets to source control.
 .env
 
+# Ignore built JavaScript files.
+dist/
+
 # Ignore installed dependencies.
 node_modules/

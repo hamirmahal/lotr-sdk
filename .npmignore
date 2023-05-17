@@ -1,0 +1,2 @@
+# Ignore test files when publishing to NPM.
+tests/
