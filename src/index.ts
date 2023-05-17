@@ -46,7 +46,7 @@ interface Quote {
  * ```
  */
 export class LordOfTheRingsSDK {
-  private apiKey: string;
+  private apiKey?: string;
 
   /**
    * This method authenticates using the provided API key,
