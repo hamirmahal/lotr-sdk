@@ -1,5 +1,24 @@
 import fetch from 'node-fetch';
 
+interface MovieData {
+  docs: Movie[];
+  total: number;
+  limit: number;
+  offset: number;
+  page: number;
+  pages: number;
+}
+interface Movie {
+  _id: string;
+  name: string;
+  runtimeInMinutes: number;
+  budgetInMillions: number;
+  boxOfficeRevenueInMillions: number;
+  academyAwardNominations: number;
+  academyAwardWins: number;
+  rottenTomatoesScore: number;
+}
+
 /**
  * This is the main class for interacting with the Lord of the Rings API.
  * @example
@@ -47,5 +66,33 @@ export class LordOfTheRingsSDK {
     }
 
     return false;
+  }
+
+  /**
+   * This method retrieves information about all movies in the Lord of the Rings API.
+   * @returns a `Promise` resolving to the movie data
+   * @throws an `Error` if the API key is missing
+   * @example
+   * ```typescript
+   * const actualMovies = await lotrSDK.getMovies();
+   * ```
+   */
+  public async getMovies(): Promise<MovieData> {
+    if (!this.apiKey) {
+      throw new Error(
+        'API key is missing in ' + this.getMovies.name + ' call.'
+      );
+    }
+
+    const headers = {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+
+    const response = await fetch('https://the-one-api.dev/v2/movie', {
+      headers
+    });
+
+    return await response.json();
   }
 }
