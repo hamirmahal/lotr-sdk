@@ -96,12 +96,11 @@ export class LordOfTheRingsSDK {
    */
   public async getMovies(): Promise<MovieData> {
     const headers = this.getHeaders(`${this.getMovies.name}()`);
-
-    const response = await fetch('https://the-one-api.dev/v2/movie', {
+    const json = await this.fetchJson(
+      'https://the-one-api.dev/v2/movie',
       headers
-    });
-
-    return await response.json();
+    );
+    return json;
   }
 
   /**
@@ -129,15 +128,10 @@ export class LordOfTheRingsSDK {
    */
   public async getMovie(movieId: string): Promise<MovieData> {
     const headers = this.getHeaders(`${this.getMovie.name}('${movieId}')`);
-
-    const response = await fetch(
+    const json = await this.fetchJson(
       `https://the-one-api.dev/v2/movie/${movieId}`,
-      {
-        headers
-      }
+      headers
     );
-
-    const json = await response.json();
 
     if (json.message === 'Something went wrong.' && json.success === false) {
       throw new Error(
@@ -176,14 +170,10 @@ export class LordOfTheRingsSDK {
       `${this.getQuotesForMovie.name}('${movieId}')`
     );
 
-    const response = await fetch(
+    const json = await this.fetchJson(
       `https://the-one-api.dev/v2/movie/${movieId}/quote`,
-      {
-        headers
-      }
+      headers
     );
-
-    const json = await response.json();
 
     if (json.message === 'Something went wrong.' && json.success === false) {
       throw new Error(
@@ -208,12 +198,11 @@ export class LordOfTheRingsSDK {
    */
   public async getAllQuotes(): Promise<QuoteData> {
     const headers = this.getHeaders(`${this.getAllQuotes.name}()`);
-
-    const response = await fetch('https://the-one-api.dev/v2/quote', {
+    const json = await this.fetchJson(
+      'https://the-one-api.dev/v2/quote',
       headers
-    });
-
-    return await response.json();
+    );
+    return json;
   }
 
   /**
@@ -242,15 +231,10 @@ export class LordOfTheRingsSDK {
    */
   public async getQuote(quoteId: string): Promise<QuoteData> {
     const headers = this.getHeaders(`${this.getQuote.name}('${quoteId}')`);
-
-    const response = await fetch(
+    const json = await this.fetchJson(
       `https://the-one-api.dev/v2/quote/${quoteId}`,
-      {
-        headers
-      }
+      headers
     );
-
-    const json = await response.json();
 
     if (json.message === 'Something went wrong.' && json.success === false) {
       throw new Error(
@@ -259,6 +243,32 @@ export class LordOfTheRingsSDK {
     }
 
     return json;
+  }
+
+  /**
+   * This helper method fetches a `JSON` response from `url` with the given headers.
+   * @param url the URL to fetch
+   * @param headers the headers to include in the request
+   * @returns the parsed `JSON` response
+   * @example
+   * ```typescript
+   * const headers = this.getHeaders(`${this.getMovies.name}()`);
+   * const json = await this.fetchJson(
+   *   'https://the-one-api.dev/v2/movie',
+   *   headers
+   * );
+   * console.log(json);
+   * ```
+   */
+  private async fetchJson(
+    url: string,
+    headers: {
+      Authorization: string;
+      'Content-Type': 'application/json';
+    }
+  ): Promise<any> {
+    const response = await fetch(url, { headers });
+    return await response.json();
   }
 
   /**
