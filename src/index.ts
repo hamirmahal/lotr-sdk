@@ -166,9 +166,8 @@ export class LordOfTheRingsSDK {
 
   /**
    * This method retrieves quotes for a specific movie in the Lord of the Rings API.
-   * @param apiKey the API key for authentication
    * @param movieId the ID of the movie for which to retrieve quotes
-   * @returns a Promise resolving to the quotes data
+   * @returns a `Promise` resolving to the quotes data
    * @throws an `Error` if the API key is missing, or if a movie with id `movieId` does not exist
    * @example
    * ```typescript
