@@ -19,6 +19,12 @@ describe(LordOfTheRingsSDK.name, () => {
       'API key is missing in ' + lotrSDK.getMovies.name + ' call.'
     );
   });
+  it('should throw an error with a useful message if requesting 1 movie without successful authentication', async () => {
+    const validMovieId = '5cd95395de30eff6ebccde5c';
+    expect(lotrSDK.getMovie(validMovieId)).rejects.toThrowError(
+      'API key is missing in ' + lotrSDK.getMovie.name + ' call.'
+    );
+  });
 
   // All tests beyond this point should have a valid API key.
   it('should authenticate without error with a correct API key', async () => {
@@ -29,5 +35,36 @@ describe(LordOfTheRingsSDK.name, () => {
   it('should fetch movies once authenticated', async () => {
     const actualMovies = await lotrSDK.getMovies();
     expect(actualMovies).toEqual(allMovies);
+  });
+  it('should throw an error with a useful message if requesting a movie ID that does not exist', async () => {
+    expect(
+      lotrSDK.getMovie('THIS_IS_AN_INVALID_MOVIE_ID')
+    ).rejects.toThrowError(
+      lotrSDK.getMovie.name +
+        ' did not find a movie with id "THIS_IS_AN_INVALID_MOVIE_ID".'
+    );
+  });
+  it('should fetch a valid movie ID without error', async () => {
+    const actualMovie = await lotrSDK.getMovie('5cd95395de30eff6ebccde5c');
+    const expectedMovie = {
+      docs: [
+        {
+          _id: '5cd95395de30eff6ebccde5c',
+          name: 'The Fellowship of the Ring',
+          runtimeInMinutes: 178,
+          budgetInMillions: 93,
+          boxOfficeRevenueInMillions: 871.5,
+          academyAwardNominations: 13,
+          academyAwardWins: 4,
+          rottenTomatoesScore: 91
+        }
+      ],
+      total: 1,
+      limit: 1000,
+      offset: 0,
+      page: 1,
+      pages: 1
+    };
+    expect(actualMovie).toEqual(expectedMovie);
   });
 });

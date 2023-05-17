@@ -95,4 +95,55 @@ export class LordOfTheRingsSDK {
 
     return await response.json();
   }
+
+  /**
+   * This method retrieves information about a specific movie in the Lord of the Rings API.
+   * @param movieId the ID of the movie to retrieve
+   * @returns a `Promise` resolving to the movie data
+   * @throws an `Error` if the API key is missing, or if the movie ID does not exist
+   * @example
+   * ```typescript
+   * try {
+   *   const actualMovie = await lotrSDK.getMovie('5cd95395de30eff6ebccde5c');
+   *   console.log(actualMovie);
+   * } catch (error) {
+   *   // This block shouldn't execute.
+   *   console.error(error);
+   * }
+   *
+   * try {
+   *   const actualMovie = await lotrSDK.getMovie('INVALID_MOVIE_ID');
+   * } catch (error) {
+   *   // This block will execute.
+   *   console.error(error);
+   * }
+   * ```
+   */
+  public async getMovie(movieId: string): Promise<MovieData> {
+    if (!this.apiKey) {
+      throw new Error('API key is missing in ' + this.getMovie.name + ' call.');
+    }
+
+    const headers = {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+
+    const response = await fetch(
+      `https://the-one-api.dev/v2/movie/${movieId}`,
+      {
+        headers
+      }
+    );
+
+    const json = await response.json();
+
+    if (json.message === 'Something went wrong.' && json.success === false) {
+      throw new Error(
+        this.getMovie.name + ' did not find a movie with id "' + movieId + '".'
+      );
+    }
+
+    return json;
+  }
 }
