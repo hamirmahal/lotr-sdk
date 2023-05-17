@@ -95,16 +95,7 @@ export class LordOfTheRingsSDK {
    * ```
    */
   public async getMovies(): Promise<MovieData> {
-    if (!this.apiKey) {
-      throw new Error(
-        'API key is missing in ' + this.getMovies.name + ' call.'
-      );
-    }
-
-    const headers = {
-      Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json'
-    };
+    const headers = this.getHeaders(`${this.getMovies.name}()`);
 
     const response = await fetch('https://the-one-api.dev/v2/movie', {
       headers
@@ -137,14 +128,7 @@ export class LordOfTheRingsSDK {
    * ```
    */
   public async getMovie(movieId: string): Promise<MovieData> {
-    if (!this.apiKey) {
-      throw new Error('API key is missing in ' + this.getMovie.name + ' call.');
-    }
-
-    const headers = {
-      Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json'
-    };
+    const headers = this.getHeaders(`${this.getMovie.name}('${movieId}')`);
 
     const response = await fetch(
       `https://the-one-api.dev/v2/movie/${movieId}`,
@@ -188,16 +172,9 @@ export class LordOfTheRingsSDK {
    * ```
    */
   public async getQuotesForMovie(movieId: string): Promise<QuoteData> {
-    if (!this.apiKey) {
-      throw new Error(
-        `API key is missing in ${this.getQuotesForMovie.name}('${movieId}') call.`
-      );
-    }
-
-    const headers = {
-      Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json'
-    };
+    const headers = this.getHeaders(
+      `${this.getQuotesForMovie.name}('${movieId}')`
+    );
 
     const response = await fetch(
       `https://the-one-api.dev/v2/movie/${movieId}/quote`,
@@ -230,16 +207,7 @@ export class LordOfTheRingsSDK {
    * ```
    */
   public async getAllQuotes(): Promise<QuoteData> {
-    if (!this.apiKey) {
-      throw new Error(
-        'API key is missing in ' + this.getAllQuotes.name + ' call.'
-      );
-    }
-
-    const headers = {
-      Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json'
-    };
+    const headers = this.getHeaders(`${this.getAllQuotes.name}()`);
 
     const response = await fetch('https://the-one-api.dev/v2/quote', {
       headers
@@ -273,16 +241,7 @@ export class LordOfTheRingsSDK {
    * ```
    */
   public async getQuote(quoteId: string): Promise<QuoteData> {
-    if (!this.apiKey) {
-      throw new Error(
-        `API key is missing in ${this.getQuote.name}('${quoteId}') call.`
-      );
-    }
-
-    const headers = {
-      Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json'
-    };
+    const headers = this.getHeaders(`${this.getQuote.name}('${quoteId}')`);
 
     const response = await fetch(
       `https://the-one-api.dev/v2/quote/${quoteId}`,
@@ -300,5 +259,39 @@ export class LordOfTheRingsSDK {
     }
 
     return json;
+  }
+
+  /**
+   * This is a helper function to get the `headers` object with
+   * `Authorization` and `Content-Type`.
+   * @param originalFnCall the original function call that needs an API key
+   * @returns The headers object with Authorization and Content-Type headers.
+   * @throws an `Error` if the API key is missing
+   * @example
+   * ```typescript
+   * public async getQuote(quoteId: string): Promise<QuoteData> {
+   *   const headers = this.getHeaders(
+   *     `API key is missing in ${this.getQuote.name}('${quoteId}') call.`
+   *   );
+   *   ...
+   * }
+   * ```
+   */
+  private getHeaders(originalFnCall: string): {
+    Authorization: string;
+    'Content-Type': 'application/json';
+  } {
+    if (!this.apiKey) {
+      throw new Error(
+        'Invalid API key for ' +
+          originalFnCall +
+          ' call. Make sure `authenticate` returns successfully before using any other methods.'
+      );
+    }
+
+    return {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
   }
 }

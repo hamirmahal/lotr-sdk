@@ -18,34 +18,34 @@ describe(LordOfTheRingsSDK.name, () => {
   });
   it('should throw an error with a useful message if requesting movies without successful authentication', async () => {
     expect(lotrSDK.getMovies()).rejects.toThrowError(
-      'API key is missing in ' + lotrSDK.getMovies.name + ' call.'
+      `Invalid API key for ${lotrSDK.getMovies.name}() call. Make sure \`authenticate\` returns successfully before using any other methods.`
     );
   });
   it('should throw an error with a useful message if requesting 1 movie without successful authentication', async () => {
     const validMovieId = '5cd95395de30eff6ebccde5c';
     expect(lotrSDK.getMovie(validMovieId)).rejects.toThrowError(
-      'API key is missing in ' + lotrSDK.getMovie.name + ' call.'
+      `Invalid API key for ${lotrSDK.getMovie.name}('${validMovieId}') call. Make sure \`authenticate\` returns successfully before using any other methods.`
     );
   });
   it('should throw an error with a useful message if requesting quotes without successful authentication', async () => {
     const validMovieId = '5cd95395de30eff6ebccde5c';
     expect(lotrSDK.getQuotesForMovie(validMovieId)).rejects.toThrowError(
-      `API key is missing in ${lotrSDK.getQuotesForMovie.name}('${validMovieId}') call.`
+      `Invalid API key for ${lotrSDK.getQuotesForMovie.name}('${validMovieId}') call. Make sure \`authenticate\` returns successfully before using any other methods.`
     );
   });
   it('should throw an error with a useful message if requesting all quotes without successful authentication', async () => {
     expect(lotrSDK.getAllQuotes()).rejects.toThrowError(
-      'API key is missing in ' + lotrSDK.getAllQuotes.name + ' call.'
+      `Invalid API key for ${lotrSDK.getAllQuotes.name}() call. Make sure \`authenticate\` returns successfully before using any other methods.`
     );
   });
   it('should throw an error with a useful message if requesting a quote without successful authentication', async () => {
     const validQuoteId = '5cd96e05de30eff6ebcced6b';
     expect(lotrSDK.getQuote(validQuoteId)).rejects.toThrowError(
-      `API key is missing in ${lotrSDK.getQuote.name}('${validQuoteId}') call.`
+      `Invalid API key for ${lotrSDK.getQuote.name}('${validQuoteId}') call. Make sure \`authenticate\` returns successfully before using any other methods.`
     );
   });
 
-  // All tests beyond this point should have a valid API key.
+  // All tests beyond this point should have valid authentication.
   it('should authenticate without error with a correct API key', async () => {
     const validAPIKey = process.env.API_KEY || '';
     const authenticationWasSuccessful = await lotrSDK.authenticate(validAPIKey);
