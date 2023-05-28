@@ -1,3 +1,5 @@
+![Tests](https://github.com/hamirmahal/lotr-sdk/actions/workflows/test.yml/badge.svg)
+
 # Installation
 
 You can run `npm install @hamirmahal/lotr-sdk` in your terminal to install this SDK for use in TypeScript and JavaScript projects.
